@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bali Route Trainer</title>
+<meta name="description" content="Drive the real roads of Bali on your phone. Free Android game built from OpenStreetMap: real roads, real hills, traffic, day and night.">
+<meta property="og:title" content="Bali Route Trainer">
+<meta property="og:description" content="Drive the real roads of Bali and learn your way around. Free, no ads, no tracking.">
+<meta property="og:image" content="assets/og_1024x500.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1e1a46">
+<link rel="icon" type="image/png" href="assets/favicon_64.png">
+<style>
+  :root {
+    --sky-top: #1e1a46;
+    --sky-mid: #ce4e4a;
+    --sky-low: #fcb258;
+    --sun: #ffe292;
+    --rice: #2e8c4e;
+    --stone: #3a242e;
+    --bg: #fbf8f3;
+    --surface: #ffffff;
+    --ink: #1f1a24;
+    --sub: #5b5563;
+    --line: #e8e1d8;
+    --accent: #c2413c;
+    --accent-ink: #ffffff;
+    --ok: #2e8c4e;
+    --shadow: 0 10px 30px rgba(30, 26, 70, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #13111c;
+      --surface: #1d1a28;
+      --ink: #f1edf4;
+      --sub: #aaa3b4;
+      --line: #2e2a3b;
+      --accent: #e0605a;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #13111c;
+    --surface: #1d1a28;
+    --ink: #f1edf4;
+    --sub: #aaa3b4;
+    --line: #2e2a3b;
+    --accent: #e0605a;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  /* Hero: the logo's own dusk, sun and rice fields */
+  .hero {
+    position: relative; overflow: hidden; color: #fff;
+    background: linear-gradient(180deg, var(--sky-top) 0%, #6a2f5a 38%, var(--sky-mid) 62%, var(--sky-low) 86%);
+    padding: 56px 0 120px;
+  }
+  .hero::before {               /* sun */
+    content: ""; position: absolute; left: 50%; bottom: 40px; width: 520px; height: 520px;
+    transform: translateX(-50%); border-radius: 50%;
+    background: radial-gradient(circle, var(--sun) 0 55%, rgba(255, 226, 146, 0.35) 56%, rgba(255, 226, 146, 0) 70%);
+    opacity: 0.55;
+  }
+  .hero::after {                /* terraces */
+    content: ""; position: absolute; left: -5%; right: -5%; bottom: -60px; height: 150px;
+    background:
+      radial-gradient(120% 60% at 50% 0%, #46a856 0 49%, transparent 50%) 0 0 / 100% 36px repeat-y,
+      var(--rice);
+    border-radius: 50% 50% 0 0 / 40px 40px 0 0;
+  }
+  .hero .wrap { position: relative; z-index: 1; display: grid; gap: 28px; justify-items: center; text-align: center; }
+  .logo { width: 132px; height: 132px; border-radius: 30px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35); }
+  h1 { margin: 0; font-size: clamp(2.2rem, 6vw, 3.6rem); line-height: 1.05; letter-spacing: -0.02em; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); }
+  .tagline { margin: 0; max-width: 620px; font-size: clamp(1.05rem, 2.6vw, 1.3rem); opacity: 0.95; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3); }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 24px;
+    border-radius: 14px; font-weight: 700; text-decoration: none; border: 0; cursor: pointer; font-size: 1.02rem;
+  }
+  .btn-primary { background: #fff; color: var(--sky-top); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { background: rgba(255, 255, 255, 0.14); color: #fff; border: 1px solid rgba(255, 255, 255, 0.4); }
+  .btn svg { width: 22px; height: 22px; flex: none; }
+  .meta { font-size: 0.9rem; opacity: 0.9; min-height: 1.4em; }
+  .pill { display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.22); font-size: 0.85rem; }
+
+  section { padding: 64px 0; }
+  h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 8px; letter-spacing: -0.01em; }
+  .lead { color: var(--sub); margin: 0 0 28px; max-width: 680px; }
+
+  /* Screenshots */
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .shots figure { margin: 0; scroll-snap-align: start; }
+  .shots img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 14px; box-shadow: var(--shadow); display: block; background: var(--line); }
+  .shots figcaption { color: var(--sub); font-size: 0.9rem; margin-top: 8px; }
+
+  /* Features */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .card h3 { margin: 10px 0 6px; font-size: 1.08rem; }
+  .card p { margin: 0; color: var(--sub); font-size: 0.97rem; }
+  .icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+  .icon svg { width: 22px; height: 22px; }
+
+  /* Install */
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+  .steps li { counter-increment: s; position: relative; padding: 18px 20px 18px 66px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .steps li::before {
+    content: counter(s); position: absolute; left: 18px; top: 16px; width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; background: var(--accent); color: var(--accent-ink);
+  }
+  .note { margin-top: 18px; padding: 14px 18px; border-left: 4px solid var(--sky-low); background: var(--surface); border-radius: 0 12px 12px 0; color: var(--sub); font-size: 0.95rem; }
+
+  /* Support */
+  .coins { display: grid; gap: 12px; }
+  .coin { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+  .coin b { font-size: 1rem; }
+  .coin small { color: var(--sub); }
+  .coin code { grid-column: 1 / 2; font: 0.92rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; color: var(--ink); }
+  .copy { grid-row: 1 / 3; grid-column: 2; min-width: 88px; min-height: 44px; border-radius: 10px; border: 0; background: var(--ok); color: #fff; font-weight: 700; cursor: pointer; }
+  .copy.done { background: var(--sky-top); }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--sub); font-size: 0.92rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; }
+  footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+
+  @media (max-width: 560px) {
+    /* One swipeable row on a phone */
+    .shots {
+      grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 86%;
+      overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px;
+    }
+    .coin { grid-template-columns: 1fr; }
+    .copy { grid-row: auto; grid-column: auto; justify-self: start; }
+    .hero::before { width: 360px; height: 360px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <img class="logo" src="assets/logo_256.png" width="132" height="132" alt="Bali Route Trainer logo: a road through a Balinese split gate at sunset">
+    <h1>Bali Route Trainer</h1>
+    <p class="tagline">Drive the real roads of Bali and learn your way around — from the rice terraces of Ubud to the streets of Denpasar and the rim of Batur.</p>
+    <div class="cta">
+      <a class="btn btn-primary" id="download" href="https://github.com/donjoe1996/bali-route-trainer-website/releases/latest/download/bali-route-trainer.apk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download for Android
+      </a>
+      <a class="btn btn-ghost" href="#install">How to install</a>
+    </div>
+    <div class="meta" id="dlmeta">Free · Android 7.0 or newer (64-bit)</div>
+    <span class="pill">Google Play — coming soon</span>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <h2>The real island, road by road</h2>
+      <p class="lead">Every road comes from OpenStreetMap and every hill from real elevation data. Pick a spot on the map and drive there.</p>
+      <div class="shots">
+        <figure><img src="assets/shot_penelokan.jpg" loading="lazy" alt="Driving Jalan Raya Penelokan along the rim of Mount Batur in the afternoon"><figcaption>Jalan Raya Penelokan, Kintamani</figcaption></figure>
+        <figure><img src="assets/shot_denpasar.jpg" loading="lazy" alt="A wide one-way street in Denpasar at midday"><figcaption>Denpasar city streets</figcaption></figure>
+        <figure><img src="assets/shot_kedisan.jpg" loading="lazy" alt="A junction in Kedisan village by Lake Batur in the morning"><figcaption>Kedisan, by Lake Batur</figcaption></figure>
+        <figure><img src="assets/shot_payangan.jpg" loading="lazy" alt="The long straight of Jalan Raya Payangan through green fields at dusk"><figcaption>Jalan Raya Payangan at dusk</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top: 0">
+    <div class="wrap">
+      <h2>What's in it</h2>
+      <p class="lead">Free roam: no missions and no timers. Just drive, and the map sticks.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 20 3 17V4l6 3 6-3 6 3v13l-6-3-6 3z"/><path d="M9 7v13M15 4v13"/></svg></div>
+          <h3>All of Bali built in</h3>
+          <p>The whole island's roads and buildings ship inside the app. Road names show as you drive, so you learn them.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 20 6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/></svg></div>
+          <h3>Real hills and valleys</h3>
+          <p>Terrain from elevation data, with the roads draped over it: climb to Kintamani, wind down to the lakes.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="20" rx="3"/><circle cx="12" cy="7" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="17" r="1.5"/></svg></div>
+          <h3>Traffic and lights</h3>
+          <p>Cars on the roads around you, traffic lights at junctions, and a WRONG WAY warning on one-way streets.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></svg></div>
+          <h3>Day and night</h3>
+          <p>The sun follows Bali's real clock. After dark, headlights light the road ahead.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+          <h3>Start anywhere</h3>
+          <p>Begin in Ubud, Sanur or Denpasar, or drag the map and drop a pin wherever you want to drive.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h3>Free, no ads, no tracking</h3>
+          <p>No account, no analytics, no location access. See the <a href="privacy-policy.html">privacy policy</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" style="padding-top: 0">
+    <div class="wrap">
+      <h2>Install on Android</h2>
+      <p class="lead">Until it's on Google Play, install the APK straight from GitHub.</p>
+      <ol class="steps">
+        <li><b>Download the APK</b> on your phone with the button at the top of this page.</li>
+        <li><b>Open it</b> from your notifications or Downloads. If Android asks, allow your browser to <i>install unknown apps</i>.</li>
+        <li><b>Tap Install</b>, then open Bali Route Trainer and pick where to drive.</li>
+      </ol>
+      <p class="note">Says <b>"App not installed"</b> when updating? Test builds are signed with a new key each time, so uninstall the old copy first, then install the new one. The app needs an internet connection for map images and terrain; Bali's roads are already inside it.</p>
+    </div>
+  </section>
+
+  <section id="support" style="padding-top: 0">
+    <div class="wrap">
+      <h2>Support the project</h2>
+      <p class="lead">Made by one person, free and without ads. If you enjoy it, a donation helps keep it going. Entirely optional, and it unlocks nothing. <b>Send only the coin named, on the network named</b> — anything else may be lost.</p>
+      <div class="coins">
+        <div class="coin"><div><b>Ethereum (ETH)</b> · <small>Ethereum network (ERC-20) only</small></div><code>0x5587413DCe89D217fb05F7F04afcE619E3b7b100</code><button class="copy" type="button">Copy</button></div>
+        <div class="coin"><div><b>Bitcoin (BTC)</b> · <small>Bitcoin network only</small></div><code>bc1q9kkt27u2nhk9uh37d0gylvmcjzdcykj0yseaz5</code><button class="copy" type="button">Copy</button></div>
+        <div class="coin"><div><b>Solana (SOL)</b> · <small>Solana network only</small></div><code>EU4NBmqUuiTtJoaSS7EqCraiRwLoz1F2XmNhk94kn6HT</code><button class="copy" type="button">Copy</button></div>
+        <div class="coin"><div><b>BNB</b> · <small>BNB Smart Chain (BEP-20) only</small></div><code>0x5587413DCe89D217fb05F7F04afcE619E3b7b100</code><button class="copy" type="button">Copy</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav>
+      <a href="https://github.com/donjoe1996/bali-route-trainer-website/releases">All versions</a>
+      <a href="https://github.com/donjoe1996/bali-route-trainer-website/issues">Report a problem</a>
+      <a href="privacy-policy.html">Privacy policy</a>
+    </nav>
+    <div>Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a> (ODbL)</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    // The button is a fixed link: CI publishes every build to the public
+    // site repo as the latest release, under the same file name. The API only
+    // adds the size and date; if it fails the button still works.
+    var SITE = "donjoe1996/bali-route-trainer-website";
+    var meta = document.getElementById("dlmeta");
+    fetch("https://api.github.com/repos/" + SITE + "/releases/latest")
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (rel) {
+        var a = (rel.assets || []).filter(function (x) { return /\.apk$/i.test(x.name); })[0];
+        if (!a) return;
+        var mb = Math.round(a.size / 1048576);
+        var day = new Date(a.updated_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+        meta.textContent = "Free · version " + rel.tag_name.replace(/^v/, "") + " · " + mb + " MB · " + day + " · Android 7.0+ (64-bit)";
+      })
+      .catch(function () { /* keep the static line */ });
+
+    document.querySelectorAll(".copy").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var text = b.parentElement.querySelector("code").textContent.trim();
+        var done = function () {
+          b.textContent = "Copied"; b.classList.add("done");
+          setTimeout(function () { b.textContent = "Copy"; b.classList.remove("done"); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () { selectText(b); });
+        } else {
+          selectText(b);
+        }
+      });
+    });
+    function selectText(b) {
+      var r = document.createRange();
+      r.selectNodeContents(b.parentElement.querySelector("code"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = "Selected";
+    }
+  })();
+</script>
+</body>
+</html>
